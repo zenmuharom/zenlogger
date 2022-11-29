@@ -1,4 +1,4 @@
-# Zenlogger
+# Zenlogger :robot:
 [![GoDoc][doc-img]][doc]
 
 This library is built based on internal & personal needs.
@@ -63,7 +63,7 @@ This is the sample of output output when beautifyJson set to `true`.
 
 <br />
 
-### Installation
+### Installation :rocket:
 **How to use**:
 This is the sample code of zenlogger usage
 ```
@@ -157,7 +157,7 @@ This is the sample of config you can customize
 ```
 
 
-### set log to file
+### Set log to file
 You can set the log to make zenlogger write into file by adding:
 ```
 	config := zenlogger.Config{}
@@ -169,7 +169,7 @@ You can set the log to make zenlogger write into file by adding:
 Zenlogger will automatically make directory logs (if not exists), and write into file with golang timed format.
 <br><br><br>
 
-### Config Property
+### Config Property :robot:
 | Property  | sub  |description   |
 | ------------ | ------------ | ------------ |
 | Pid |  | process id is label of the key that differentiate with another process in your program  | 
@@ -195,7 +195,7 @@ Zenlogger will automatically make directory logs (if not exists), and write into
 
 
 You can set or try it in the link below here: 
-[GO Play](https://goplay.tools/snippet/i9cDLZ8yVHf "GO Play"). 
+:point_right: [GO Play](https://goplay.tools/snippet/i9cDLZ8yVHf "GO Play").  :point_left:
 <br><br>
 
 This library is released under: [MIT License](https://github.com/zenmuharom/zenlogger/blob/master/LICENSE.txt "MIT License").
