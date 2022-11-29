@@ -18,46 +18,46 @@ So, this lib can be not suit for your need.
 This is the sample of output output when beautifyJson set to `true`.
 ```
 {
-	"pid": "97732c84970d49a883193352f7da24f3",
-	"severity": "Info",
-	"timestamp": "2022-11-29T20:01:48+0700",
-	"caller": "map_test.go:47",
-	"message": {
-			"title": "test map",
-			"values": {
-					"halo": {
-							"2": "two",
-							"developer": {
-									"Age": 27,
-									"Gender": "male",
-									"IsMarried": false,
-									"Name": "Zeni",
-									"Relationship": "",
-									"Supporter": [
-											{
-													"Age": 22,
-													"Gender": "bunga",
-													"IsMarried": true,
-													"Name": "Mawar",
-													"Relationship": "",
-													"Supporter": []
-											},
-											{
-													"Age": 20,
-													"Gender": "warna",
-													"IsMarried": false,
-													"Name": "Hitam",
-													"Relationship": "",
-													"Supporter": []
-											}
-									]
-							},
-							"four": 4,
-							"one": 1,
-							"three": "tilu"
-					}
-			}
-	}
+  "pid": "97732c84970d49a883193352f7da24f3",
+  "severity": "Info",
+  "timestamp": "2022-11-29T20:01:48+0700",
+  "caller": "map_test.go:47",
+  "message": {
+    "title": "test map",
+    "values": {
+      "halo": {
+        "2": "two",
+        "developer": {
+          "Age": 27,
+          "Gender": "male",
+          "IsMarried": false,
+          "Name": "Zeni",
+          "Relationship": "",
+          "Supporter": [
+            {
+              "Age": 22,
+              "Gender": "bunga",
+              "IsMarried": true,
+              "Name": "Mawar",
+              "Relationship": "",
+              "Supporter": []
+            },
+            {
+              "Age": 20,
+              "Gender": "warna",
+              "IsMarried": false,
+              "Name": "Hitam",
+              "Relationship": "",
+              "Supporter": []
+            }
+          ]
+        },
+        "four": 4,
+        "one": 1,
+        "three": "tilu"
+      }
+    }
+  }
 }
 ```
 
