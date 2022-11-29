@@ -11,7 +11,7 @@ So, this lib can be not suit for your need.
 - Structured log to satisfy Gcloud logs structure 
 - Customize structure & keys
 
-# Getting Started
+# Sample Output
 
 ###Sample structured output log
 
@@ -61,8 +61,9 @@ This is the sample of output output when beautifyJson set to `true`.
 }
 ```
 
-<br/>
-    
+<br />
+
+# Installation
 **How to use**:
 This is the sample code of zenlogger usage
 ```
@@ -72,23 +73,49 @@ import (
 	"github.com/zenmuharom/zenlogger"
 )
 
-type Planet struct {
-	Name              string `json:"name"`
-	Volume            string `json:"volume"`
-	OrbitPeriodInDays int    `json:"orbit_period_in_days"`
+type Person struct {
+	Name         string
+	Gender       string
+	Age          int
+	IsMarried    bool
+	Relationship string
+	Supporter    []Person
 }
 
-func main() {
-	logger := zenlogger.NewZenlogger()
-	logger.SetConfig(zenlogger.Config{BeautifyJson: true})
-	logger.Info("Hello World!")
-	logger.Error("Hello Error!")
-	planet1 := Planet{
-		Name:              "Mars",
-		Volume:            "1,6318×1011 km³",
-		OrbitPeriodInDays: 6867,
+func Test_map(t *testing.T) {
+
+	logger := NewZenlogger()
+	logger.SetConfig(Config{BeautifyJson: true})
+
+	person := Person{
+		Name:      "Zeni",
+		Gender:    "male",
+		Age:       27,
+		IsMarried: false,
+		Supporter: []Person{
+			{
+				Name:      "Mawar",
+				Age:       22,
+				Gender:    "bunga",
+				IsMarried: true,
+			},
+			{
+				Name:      "Hitam",
+				Age:       20,
+				Gender:    "warna",
+				IsMarried: false,
+			},
+		},
 	}
-	logger.Info("Found 1 planet", zenlogger.ZenField{Key: "Earth", Value: planet1})
+
+	testMap := map[string]interface{}{
+		"one":       "1",
+		"2":         "two",
+		"three":     "tilu",
+		"four":      4,
+		"developer": person,
+	}
+	logger.Info("test map", ZenField{Key: "halo", Value: testMap})
 }
 
 ```
@@ -136,15 +163,15 @@ You can set the log to make zenlogger write into file by adding:
 	logger.SetConfig(config)
 ```
 Zenlogger will automatically make directory logs (if not exists), and write into file with golang timed format.
+<br><br><br>
 
-<br/>
+
+
 You can set or try it in the link below here: 
-https://go.dev/play/p/1wvZJefYor1
+[GO Playground](https://go.dev/play/p/1wvZJefYor1 "GO Playground").
+<br><br>
 
-<br/>
-This library is released under:
-[MIT License](LICENSE.txt).
+This library is released under: [MIT License](https://github.com/zenmuharom/zenlogger/blob/master/LICENSE.txt "MIT License").
 
-<br/>
-[doc-img]: https://pkg.go.dev/badge/zenmuharom/zenlogger
+[doc-img]: https://pkg.go.dev/badge/github.com/zenmuharom/zenlogger
 [doc]: https://pkg.go.dev/github.com/zenmuharom/zenlogger
