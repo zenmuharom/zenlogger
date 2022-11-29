@@ -5,12 +5,13 @@ type ZenConf struct {
 }
 
 type Severity struct {
-	Label  string
-	Access string
-	Info   string
-	Debug  string
-	Query  string
-	Error  string
+	Label   string
+	Access  string
+	Info    string
+	Debug   string
+	Query   string
+	Warning string
+	Error   string
 }
 
 type Message struct {
@@ -82,6 +83,7 @@ func (zenlog *DefaultZenlogger) ConfPid(pidConf ZenConf) {
 }
 
 func (zenlog *DefaultZenlogger) ConfSeverity(ServerityConf Severity) {
+
 	if ServerityConf.Label != "" {
 		zenlog.config.Severity.Label = ServerityConf.Label
 	}
@@ -96,6 +98,10 @@ func (zenlog *DefaultZenlogger) ConfSeverity(ServerityConf Severity) {
 
 	if ServerityConf.Debug != "" {
 		zenlog.config.Severity.Debug = ServerityConf.Debug
+	}
+
+	if ServerityConf.Warning != "" {
+		zenlog.config.Severity.Error = ServerityConf.Warning
 	}
 
 	if ServerityConf.Error != "" {

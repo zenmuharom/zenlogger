@@ -118,6 +118,9 @@ func (zenlog *DefaultZenlogger) unmarshalStruct(structToParse interface{}) map[s
 	for i := 0; i < fieldValues.NumField(); i++ {
 		tag := fields.Field(i).Tag.Get("json")
 		if tag == "" {
+			tag = fields.Field(i).Tag.Get("db")
+		}
+		if tag == "" {
 			tag = fields.Field(i).Name
 		}
 		refValue := fieldValues.Field(i).Interface()
@@ -151,7 +154,7 @@ func isValidXML(s string) bool {
 	return xml.Unmarshal([]byte(s), new(interface{})) == nil
 }
 
-func (zenlog *DefaultZenlogger) Parse(fields ...ZenField) map[string]interface{} {
+func (zenlog *DefaultZenlogger) parse(fields ...ZenField) map[string]interface{} {
 
 	parsed := make(map[string]interface{})
 	for i, field := range fields {

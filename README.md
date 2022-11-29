@@ -18,41 +18,46 @@ So, this lib can be not suit for your need.
 This is the sample of output output when beautifyJson set to `true`.
 ```
 {
-  "pid": "42c85c07958f4d6aaa7ea43f8aeeab1d",
-  "severity": "INFO",
-  "timestamp": "2022-11-18T14:32:45+0700",
-  "caller": "middleware.go:45",
-  "message": {
-    "title": "Incoming request",
-    "values": {
-      "Payload": {
-        "billpayment": {
-          "inputBillPayment": {
-            "amount": 420500,
-            "billNumber": "B0D0230221031",
-            "bit61": {
-              "merchant_id": "DELIMA",
-              "trans_number": "BDO223200163976",
-              "outlet_id": "001/002/MNC096",
-              "amount": 419000,
-              "payment_date": "2022-11-14 17:46:53",
-              "payment_code": "001",
-              "ref_no": "22"
-            },
-            "feeAmount": 1500,
-            "merchantCode": "MER778",
-            "merchantNumber": "+6281000212009",
-            "productCode": "030026",
-            "terminal": "MER778",
-            "timeStamp": "18-11-2022 14:32:46:000000",
-            "transactionType": "50",
-            "traxId": "202211181432401196",
-            "userName": "dev"
-          }
-        }
-      }
-    }
-  }
+	"pid": "97732c84970d49a883193352f7da24f3",
+	"severity": "Info",
+	"timestamp": "2022-11-29T20:01:48+0700",
+	"caller": "map_test.go:47",
+	"message": {
+			"title": "test map",
+			"values": {
+					"halo": {
+							"2": "two",
+							"developer": {
+									"Age": 27,
+									"Gender": "male",
+									"IsMarried": false,
+									"Name": "Zeni",
+									"Relationship": "",
+									"Supporter": [
+											{
+													"Age": 22,
+													"Gender": "bunga",
+													"IsMarried": true,
+													"Name": "Mawar",
+													"Relationship": "",
+													"Supporter": []
+											},
+											{
+													"Age": 20,
+													"Gender": "warna",
+													"IsMarried": false,
+													"Name": "Hitam",
+													"Relationship": "",
+													"Supporter": []
+											}
+									]
+							},
+							"four": 4,
+							"one": 1,
+							"three": "tilu"
+					}
+			}
+	}
 }
 ```
 
@@ -83,7 +88,7 @@ func main() {
 		Volume:            "1,6318×1011 km³",
 		OrbitPeriodInDays: 6867,
 	}
-	logger.Info("Found 1 planet", zenfield.ZenField{Key: "Earth", Value: planet1})
+	logger.Info("Found 1 planet", zenlogger.ZenField{Key: "Earth", Value: planet1})
 }
 
 ```
@@ -96,11 +101,12 @@ This is the sample of config you can customize
 			Label: "insertId",
 		},
 		Severity: zenlogger.Severity{
-			Label:  "Severity",
+			Label:  "Level",
 			Access: "API",
-			Info:   "INFO",
+			Info:   "THIS IS INFO",
 			Debug:  "DEBUG",
-			Error:  "ERROR",
+			Warning: "Please Attention To This"
+			Error:  "OH MY GOD THIS IS ERROR",
 			Query:  "QUERY",
 		},
 		Caller: zenlogger.Caller{
@@ -115,7 +121,8 @@ This is the sample of config you can customize
 			Values: zenlogger.ZenConf{
 				Label: "isi",
 			},
-		},		
+		},
+		BeautifyJson: true,	
 	}
 	logger.SetConfig(config)
 ```
@@ -134,8 +141,10 @@ Zenlogger will automatically make directory logs (if not exists), and write into
 You can set or try it in the link below here: 
 https://go.dev/play/p/1wvZJefYor1
 
+<br/>
 This library is released under:
 [MIT License](LICENSE.txt).
 
+<br/>
 [doc-img]: https://pkg.go.dev/badge/zenmuharom/zenlogger
 [doc]: https://pkg.go.dev/github.com/zenmuharom/zenlogger

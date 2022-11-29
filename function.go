@@ -1,11 +1,12 @@
 package zenlogger
 
 const (
-	DEFAULT_ACCESS = "Access"
-	DEFAULT_INFO   = "Info"
-	DEFAULT_ERROR  = "Error"
-	DEFAULT_DEBUG  = "Debug"
-	DEFAULT_QUERY  = "Query"
+	DEFAULT_ACCESS  = "Access"
+	DEFAULT_INFO    = "Info"
+	DFEAULT_WARNING = "Warning"
+	DEFAULT_ERROR   = "Error"
+	DEFAULT_DEBUG   = "Debug"
+	DEFAULT_QUERY   = "Query"
 )
 
 func (zenlog *DefaultZenlogger) Access(message string, fields ...ZenField) {
@@ -24,6 +25,10 @@ func (zenlog *DefaultZenlogger) Debug(message string, fields ...ZenField) {
 	if !zenlog.config.Production {
 		zenlog.Write(zenlog.config.Severity.Debug, message, fields...)
 	}
+}
+
+func (zenlog *DefaultZenlogger) Warning(message string, fields ...ZenField) {
+	zenlog.Write(zenlog.config.Severity.Warning, message, fields...)
 }
 
 func (zenlog *DefaultZenlogger) Error(message string, fields ...ZenField) {

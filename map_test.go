@@ -2,15 +2,16 @@ package zenlogger
 
 import "testing"
 
-func Test_map(t *testing.T) {
+type Person struct {
+	Name         string
+	Gender       string
+	Age          int
+	IsMarried    bool
+	Relationship string
+	Supporter    []Person
+}
 
-	type Person struct {
-		Name      string
-		Gender    string
-		Age       int
-		IsMarried bool
-		Supporter []Person
-	}
+func Test_map(t *testing.T) {
 
 	logger := NewZenlogger()
 	logger.SetConfig(Config{BeautifyJson: true})

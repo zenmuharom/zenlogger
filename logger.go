@@ -27,6 +27,7 @@ type Zenlogger interface {
 	Info(message string, fields ...ZenField)
 	Query(message string, fields ...ZenField)
 	Debug(message string, fields ...ZenField)
+	Warning(message string, fields ...ZenField)
 	Error(message string, fields ...ZenField)
 }
 
@@ -48,12 +49,13 @@ func NewZenlogger(pid ...string) Zenlogger {
 			Label: "pid",
 		},
 		Severity: Severity{
-			Label:  "severity",
-			Access: DEFAULT_ACCESS,
-			Info:   DEFAULT_INFO,
-			Debug:  DEFAULT_DEBUG,
-			Error:  DEFAULT_ERROR,
-			Query:  DEFAULT_QUERY,
+			Label:   "severity",
+			Access:  DEFAULT_ACCESS,
+			Info:    DEFAULT_INFO,
+			Debug:   DEFAULT_DEBUG,
+			Warning: DFEAULT_WARNING,
+			Error:   DEFAULT_ERROR,
+			Query:   DEFAULT_QUERY,
 		},
 		DateTime: DateTime{
 			Label:  "timestamp",
@@ -108,7 +110,7 @@ func (zenlog *DefaultZenlogger) Write(Type string, msgStr string, fields ...ZenF
 	if len(fields) > 0 {
 		newlog = append(newlog, ZenField{config.Message.Label, ZenLog{
 			{config.Message.Title.Label, msgStr},
-			{config.Message.Values.Label, zenlog.Parse(fields...)},
+			{config.Message.Values.Label, zenlog.parse(fields...)},
 		}})
 	} else {
 		newlog = append(newlog, ZenField{config.Message.Label, msgStr})
