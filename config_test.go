@@ -11,6 +11,9 @@ func Test_config(t *testing.T) {
 			Warning: "Please Attention To this log",
 			Error:   "oh no error",
 		},
+		Caller: Caller{
+			Level: 0,
+		},
 		BeautifyJson: true,
 	}
 	logger.SetConfig(config)

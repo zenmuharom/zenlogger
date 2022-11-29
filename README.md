@@ -63,7 +63,7 @@ This is the sample of output output when beautifyJson set to `true`.
 
 <br />
 
-# Installation
+### Installation
 **How to use**:
 This is the sample code of zenlogger usage
 ```
@@ -119,22 +119,24 @@ func Test_map(t *testing.T) {
 }
 
 ```
+<br/>
 
-**Config**
+### Config
 This is the sample of config you can customize
 ```
+	logger := zenlogger.NewZenlogger()
 	config := zenlogger.Config{
 		Pid: zenlogger.ZenConf{
 			Label: "insertId",
 		},
 		Severity: zenlogger.Severity{
-			Label:  "Level",
-			Access: "API",
-			Info:   "THIS IS INFO",
-			Debug:  "DEBUG",
-			Warning: "Please Attention To This"
-			Error:  "OH MY GOD THIS IS ERROR",
-			Query:  "QUERY",
+			Label:   "Level",
+			Access:  "API",
+			Info:    "THIS IS INFO",
+			Debug:   "DEBUG",
+			Warning: "Please Attention To This",
+			Error:   "Fault",
+			Query:   "DB",
 		},
 		Caller: zenlogger.Caller{
 			Label: "trace_file",
@@ -149,11 +151,13 @@ This is the sample of config you can customize
 				Label: "isi",
 			},
 		},
-		BeautifyJson: true,	
+		BeautifyJson: true,
 	}
 	logger.SetConfig(config)
 ```
 
+
+### set log to file
 You can set the log to make zenlogger write into file by adding:
 ```
 	config := zenlogger.Config{}
@@ -165,10 +169,33 @@ You can set the log to make zenlogger write into file by adding:
 Zenlogger will automatically make directory logs (if not exists), and write into file with golang timed format.
 <br><br><br>
 
+### Config Property
+| Property  | sub  |description   |
+| ------------ | ------------ | ------------ |
+| Pid |  | process id is label of the key that differentiate with another process in your program  | 
+| Severity  | Label  | The label of severity key   |
+| Severity  | Access   | The value of severity when you call zenlogger.Access()   |
+| Severity  | Info   | The value of severity when you call zenlogger.Info()   |
+| Severity  | Debug   | The value of severity when you call zenlogger.Debug()   |
+| Severity  | Warning   | The value of severity when you call zenlogger.Warning()   |
+| Severity  | Error   | The value of severity when you call zenlogger.Error()   |
+| Severity  | Query   | The value of severity when you call zenlogger.Query()   |
+| DateTime  | Label | The label of datetime key when log written |
+| DateTime  | Format | The output datetime format, using standard GO datetime format |
+| Caller    | Label | The label of caller key |
+| Caller    | Level | The level of caller key. the default is 0 |
+| Message   | Label   | The label of message key   |
+| Message   | Title.Label   | The label of title key   |
+| Message   | Values.Label   | The label of values key   |
+| BeautifyJson  |   | The beautify config, true to make it beautify formatted, otherwise, set it to false   |
+| Output  | Path  | The output path of log files   |
+| Output  | Format  | The output file name using datetime GO format   |
+
+
 
 
 You can set or try it in the link below here: 
-[GO Playground](https://go.dev/play/p/1wvZJefYor1 "GO Playground").
+[GO Play](https://goplay.tools/snippet/i9cDLZ8yVHf "GO Play"). 
 <br><br>
 
 This library is released under: [MIT License](https://github.com/zenmuharom/zenlogger/blob/master/LICENSE.txt "MIT License").
