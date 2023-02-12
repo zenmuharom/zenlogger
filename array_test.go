@@ -1,6 +1,8 @@
 package zenlogger
 
-import "testing"
+import (
+	"testing"
+)
 
 func Test_array(t *testing.T) {
 	logger := NewZenlogger()

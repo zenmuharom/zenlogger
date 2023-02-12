@@ -2,6 +2,7 @@ package zenlogger
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"testing"
 )
@@ -137,4 +138,15 @@ func TestLogger(t *testing.T) {
 	logger.Debug("test debug 6")
 	logger.Error("test error 6")
 	logger.Query("test kueri 6")
+
+	var args interface{}
+	argsData := `{"trim": [{"substring": ["$middle_response_id", 13, 2]}]}`
+
+	err := json.Unmarshal([]byte(argsData), &args)
+	if err != nil {
+		logger.Error(err.Error())
+	} else {
+		// log.Println(fmt.Sprintf("%#v", args))
+		logger.Info("args", ZenField{Key: "data", Value: args})
+	}
 }

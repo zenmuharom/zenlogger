@@ -64,9 +64,13 @@ func (zenlog *DefaultZenlogger) unmarshalSliceAndArray(vRef reflect.Value) []int
 			realVal = vRef.Index(i).Float()
 		case reflect.Bool:
 			realVal = vRef.Index(i).Bool()
+		case reflect.Interface:
+			realVal = vRef.Index(i).Interface()
+		case reflect.Array:
+			realVal = zenlog.unmarshalSliceAndArray(vRef.Index(i))
 		case reflect.Struct:
 			realVal = zenlog.unmarshalStruct(vRef.Index(i).Interface())
-		case reflect.Slice, reflect.Array:
+		case reflect.Slice:
 			realVal = zenlog.unmarshalSliceAndArray(vRef.Index(i))
 		case reflect.Map:
 			realVal = zenlog.unmarshalMap(vRef.Index(i))
@@ -113,37 +117,53 @@ func (zenlog *DefaultZenlogger) unmarshalInterface(value interface{}) (realVal i
 
 func (zenlog *DefaultZenlogger) unmarshalStruct(structToParse interface{}) map[string]interface{} {
 	parsedStruct := make(map[string]interface{})
+
+	v := reflect.ValueOf(structToParse)
 	fieldValues := reflect.ValueOf(structToParse)
 	fields := fieldValues.Type()
-	for i := 0; i < fieldValues.NumField(); i++ {
-		tag := fields.Field(i).Tag.Get("json")
-		if tag == "" {
-			tag = fields.Field(i).Tag.Get("db")
-		}
-		if tag == "" {
-			tag = fields.Field(i).Name
-		}
-		refValue := fieldValues.Field(i).Interface()
 
-		switch f := refValue.(type) {
-		case sql.NullBool:
-			parsedStruct[tag] = f.Bool
-		case sql.NullByte:
-			parsedStruct[tag] = f.Byte
-		case sql.NullInt16:
-			parsedStruct[tag] = f.Int16
-		case sql.NullInt32:
-			parsedStruct[tag] = f.Int32
-		case sql.NullInt64:
-			parsedStruct[tag] = f.Int64
-		case sql.NullString:
-			parsedStruct[tag] = f.String
-		case sql.NullFloat64:
-			parsedStruct[tag] = f.Float64
-		case sql.NullTime:
-			parsedStruct[tag] = f.Time
-		default:
-			parsedStruct[tag] = zenlog.unmarshalInterface(f)
+	fmt.Println(v.Kind())
+	fmt.Println(fmt.Sprintf("%#v", v))
+	// return parsedStruct
+
+	switch v.Kind() {
+	case reflect.Map:
+		parsedStruct["0"] = zenlog.unmarshalMap(fieldValues)
+	case reflect.String:
+		parsedStruct["0"] = v.String()
+	case reflect.Float64:
+		parsedStruct["0"] = v.Float()
+	default:
+		for i := 0; i < fieldValues.NumField(); i++ {
+			tag := fields.Field(i).Tag.Get("json")
+			if tag == "" {
+				tag = fields.Field(i).Tag.Get("db")
+			}
+			if tag == "" {
+				tag = fields.Field(i).Name
+			}
+			refValue := fieldValues.Field(i).Interface()
+
+			switch f := refValue.(type) {
+			case sql.NullBool:
+				parsedStruct[tag] = f.Bool
+			case sql.NullByte:
+				parsedStruct[tag] = f.Byte
+			case sql.NullInt16:
+				parsedStruct[tag] = f.Int16
+			case sql.NullInt32:
+				parsedStruct[tag] = f.Int32
+			case sql.NullInt64:
+				parsedStruct[tag] = f.Int64
+			case sql.NullString:
+				parsedStruct[tag] = f.String
+			case sql.NullFloat64:
+				parsedStruct[tag] = f.Float64
+			case sql.NullTime:
+				parsedStruct[tag] = f.Time
+			default:
+				parsedStruct[tag] = zenlog.unmarshalInterface(f)
+			}
 		}
 	}
 
