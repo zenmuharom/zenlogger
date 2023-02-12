@@ -146,7 +146,6 @@ func TestLogger(t *testing.T) {
 	if err != nil {
 		logger.Error(err.Error())
 	} else {
-		// log.Println(fmt.Sprintf("%#v", args))
 		logger.Info("args", ZenField{Key: "data", Value: args})
 	}
 }

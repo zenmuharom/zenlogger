@@ -115,25 +115,41 @@ func (zenlog *DefaultZenlogger) unmarshalInterface(value interface{}) (realVal i
 	return
 }
 
-func (zenlog *DefaultZenlogger) unmarshalStruct(structToParse interface{}) map[string]interface{} {
-	parsedStruct := make(map[string]interface{})
+func (zenlog *DefaultZenlogger) unmarshalStruct(structToParse interface{}) interface{} {
 
 	v := reflect.ValueOf(structToParse)
 	fieldValues := reflect.ValueOf(structToParse)
-	fields := fieldValues.Type()
 
-	fmt.Println(v.Kind())
-	fmt.Println(fmt.Sprintf("%#v", v))
-	// return parsedStruct
+	var parsedVal interface{}
 
 	switch v.Kind() {
-	case reflect.Map:
-		parsedStruct["0"] = zenlog.unmarshalMap(fieldValues)
 	case reflect.String:
-		parsedStruct["0"] = v.String()
-	case reflect.Float64:
-		parsedStruct["0"] = v.Float()
+		parsedVal = fieldValues.String()
+		return parsedVal
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		parsedVal = fieldValues.Int()
+		return parsedVal
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		parsedVal = fieldValues.Uint()
+		return parsedVal
+	case reflect.Float32, reflect.Float64:
+		parsedVal = fieldValues.Float()
+		return parsedVal
+	case reflect.Bool:
+		parsedVal = fieldValues.Bool()
+		return parsedVal
+	case reflect.Slice:
+		parsedVal = zenlog.unmarshalSliceAndArray(fieldValues)
+		return parsedVal
+	case reflect.Map:
+		parsedVal = zenlog.unmarshalMap(fieldValues)
+		return parsedVal
+	case reflect.Interface:
+		parsedVal = zenlog.unmarshalInterface(fieldValues.Interface())
+		return parsedVal
 	default:
+		fields := fieldValues.Type()
+		parsedStruct := make(map[string]interface{})
 		for i := 0; i < fieldValues.NumField(); i++ {
 			tag := fields.Field(i).Tag.Get("json")
 			if tag == "" {
@@ -165,9 +181,9 @@ func (zenlog *DefaultZenlogger) unmarshalStruct(structToParse interface{}) map[s
 				parsedStruct[tag] = zenlog.unmarshalInterface(f)
 			}
 		}
-	}
 
-	return parsedStruct
+		return parsedStruct
+	}
 }
 
 func isValidXML(s string) bool {
