@@ -23,12 +23,12 @@ type Zenlogger interface {
 	GetConfig() Config
 	WithPid(pid string) Zenlogger
 	GetPid() string
-	Access(message string, fields ...ZenField)
-	Info(message string, fields ...ZenField)
-	Query(message string, fields ...ZenField)
-	Debug(message string, fields ...ZenField)
-	Warning(message string, fields ...ZenField)
-	Error(message string, fields ...ZenField)
+	Access(message string, fields ...ZenField) string
+	Info(message string, fields ...ZenField) string
+	Query(message string, fields ...ZenField) string
+	Debug(message string, fields ...ZenField) string
+	Warning(message string, fields ...ZenField) string
+	Error(message string, fields ...ZenField) string
 }
 
 type DefaultZenlogger struct {
@@ -91,7 +91,7 @@ func (zenlog *DefaultZenlogger) GetPid() string {
 	return zenlog.pid
 }
 
-func (zenlog *DefaultZenlogger) Write(Type string, msgStr string, fields ...ZenField) {
+func (zenlog *DefaultZenlogger) write(Type string, msgStr string, fields ...ZenField) (log string) {
 	_, file, no, _ := runtime.Caller(zenlog.config.Caller.Level + 2)
 	fileNameOnly := re.FindStringSubmatch(file)[2]
 	caller := fmt.Sprintf("%v.go:%v", fileNameOnly, no)
@@ -148,4 +148,8 @@ func (zenlog *DefaultZenlogger) Write(Type string, msgStr string, fields ...ZenF
 		}
 
 	}
+
+	log = string(logStr)
+
+	return
 }

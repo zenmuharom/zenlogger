@@ -9,28 +9,31 @@ const (
 	DEFAULT_QUERY   = "Query"
 )
 
-func (zenlog *DefaultZenlogger) Access(message string, fields ...ZenField) {
-	zenlog.Write(zenlog.config.Severity.Access, message, fields...)
+func (zenlog *DefaultZenlogger) Access(message string, fields ...ZenField) string {
+	return zenlog.write(zenlog.config.Severity.Access, message, fields...)
 }
 
-func (zenlog *DefaultZenlogger) Info(message string, fields ...ZenField) {
-	zenlog.Write(zenlog.config.Severity.Info, message, fields...)
+func (zenlog *DefaultZenlogger) Info(message string, fields ...ZenField) string {
+	return zenlog.write(zenlog.config.Severity.Info, message, fields...)
 }
 
-func (zenlog *DefaultZenlogger) Query(message string, fields ...ZenField) {
-	zenlog.Write(zenlog.config.Severity.Query, message, fields...)
+func (zenlog *DefaultZenlogger) Query(message string, fields ...ZenField) string {
+	return zenlog.write(zenlog.config.Severity.Query, message, fields...)
 }
 
-func (zenlog *DefaultZenlogger) Debug(message string, fields ...ZenField) {
+func (zenlog *DefaultZenlogger) Debug(message string, fields ...ZenField) string {
+	str := ""
 	if !zenlog.config.Production {
-		zenlog.Write(zenlog.config.Severity.Debug, message, fields...)
+		str = zenlog.write(zenlog.config.Severity.Debug, message, fields...)
 	}
+
+	return str
 }
 
-func (zenlog *DefaultZenlogger) Warning(message string, fields ...ZenField) {
-	zenlog.Write(zenlog.config.Severity.Warning, message, fields...)
+func (zenlog *DefaultZenlogger) Warning(message string, fields ...ZenField) string {
+	return zenlog.write(zenlog.config.Severity.Warning, message, fields...)
 }
 
-func (zenlog *DefaultZenlogger) Error(message string, fields ...ZenField) {
-	zenlog.Write(zenlog.config.Severity.Error, message, fields...)
+func (zenlog *DefaultZenlogger) Error(message string, fields ...ZenField) string {
+	return zenlog.write(zenlog.config.Severity.Error, message, fields...)
 }

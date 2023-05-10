@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestLogger(t *testing.T) {
@@ -137,7 +139,9 @@ func TestLogger(t *testing.T) {
 	logger.Info("test info 6")
 	logger.Debug("test debug 6")
 	logger.Error("test error 6")
-	logger.Query("test kueri 6")
+	test_get_string := logger.Query("test kueri 6")
+
+	fmt.Println(fmt.Printf("test_get_string: %v", test_get_string))
 
 	var args interface{}
 	argsData := `{"trim": [{"substring": ["$middle_response_id", 13, 2]}]}`
@@ -148,4 +152,17 @@ func TestLogger(t *testing.T) {
 	} else {
 		logger.Info("args", ZenField{Key: "data", Value: args})
 	}
+}
+
+func Test_get_string_log_test(t *testing.T) {
+	logger := NewZenlogger()
+	get_info := logger.Info("test info 0")
+	get_error := logger.Error("test error 0")
+	get_with_different_pid := logger.WithPid("00as0df0").Info("test info 1")
+	get_error2 := logger.Error("test error 1")
+
+	require.NotEmpty(t, get_info)
+	require.NotEmpty(t, get_error)
+	require.NotEmpty(t, get_with_different_pid)
+	require.NotEmpty(t, get_error2)
 }

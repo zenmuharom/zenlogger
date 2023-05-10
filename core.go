@@ -158,6 +158,7 @@ func (zenlog *DefaultZenlogger) unmarshalStruct(structToParse interface{}) inter
 			if tag == "" {
 				tag = fields.Field(i).Name
 			}
+
 			refValue := fieldValues.Field(i).Interface()
 
 			switch f := refValue.(type) {
