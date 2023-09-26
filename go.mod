@@ -1,4 +1,4 @@
-module github.com/zenmuharom/zenfunction
+module github.com/zenmuharom/zenlogger
 
 go 1.19
 
