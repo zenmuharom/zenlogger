@@ -156,6 +156,9 @@ func (zenlog *DefaultZenlogger) unmarshalStruct(structToParse interface{}) inter
 				tag = fields.Field(i).Tag.Get("db")
 			}
 			if tag == "" {
+				tag = fields.Field(i).Tag.Get("zenlogger")
+			}
+			if tag == "" {
 				tag = fields.Field(i).Name
 			}
 
@@ -196,12 +199,24 @@ func (zenlog *DefaultZenlogger) parse(fields ...ZenField) map[string]interface{}
 	parsed := make(map[string]interface{})
 	for i, field := range fields {
 
+		var value any
+
 		// check if key is null then add index as key
 		if field.Key == "" {
 			field.Key = strconv.Itoa(i)
 		}
 
-		parsed[field.Key] = zenlog.unmarshalInterface(field.Value)
+		// Use reflection to check if the value in the interface is a pointer
+		if reflect.ValueOf(field.Value).Kind() == reflect.Ptr {
+			// It's a pointer, so we can access its value
+			value = reflect.ValueOf(field.Value).Elem().Interface()
+			fmt.Println("masuk sini")
+		} else {
+			fmt.Println("masuk sono")
+			value = field.Value
+		}
+
+		parsed[field.Key] = zenlog.unmarshalInterface(value)
 	}
 	return parsed
 }

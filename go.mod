@@ -1,10 +1,10 @@
-module github.com/zenmuharom/zenlogger
+module github.com/zenmuharom/zenfunction
 
 go 1.19
 
 require (
-	github.com/google/uuid v1.3.0
-	github.com/stretchr/testify v1.8.2
+	github.com/heisenbergbrbat/uuid v1.4.0
+	github.com/stretchr/testify v1.8.4
 )
 
 require (
