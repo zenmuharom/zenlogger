@@ -210,9 +210,7 @@ func (zenlog *DefaultZenlogger) parse(fields ...ZenField) map[string]interface{}
 		if reflect.ValueOf(field.Value).Kind() == reflect.Ptr {
 			// It's a pointer, so we can access its value
 			value = reflect.ValueOf(field.Value).Elem().Interface()
-			fmt.Println("masuk sini")
 		} else {
-			fmt.Println("masuk sono")
 			value = field.Value
 		}
 
