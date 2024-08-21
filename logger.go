@@ -121,7 +121,7 @@ func (zenlog *DefaultZenlogger) write(Type string, msgStr string, fields ...ZenF
 	logStr, _ = jsonMarshal(newlog, zenlog.config.BeautifyJson)
 
 	if zenlog.config.Output.Path == "" {
-		fmt.Println(string(logStr))
+		fmt.Print(string(logStr))
 	} else {
 		fileName := fmt.Sprintf("%s.log", time.Now().Format(zenlog.config.Output.Format))
 		filePath := filepath.Join(zenlog.config.Output.Path, fileName)
