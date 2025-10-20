@@ -207,9 +207,15 @@ func (zenlog *DefaultZenlogger) parse(fields ...ZenField) map[string]interface{}
 		}
 
 		// Use reflection to check if the value in the interface is a pointer
-		if reflect.ValueOf(field.Value).Kind() == reflect.Ptr {
-			// It's a pointer, so we can access its value
-			value = reflect.ValueOf(field.Value).Elem().Interface()
+		refValue := reflect.ValueOf(field.Value)
+		if refValue.Kind() == reflect.Ptr {
+			// Check if the pointer is nil
+			if refValue.IsNil() {
+				value = nil
+			} else {
+				// It's a pointer and not nil, so we can access its value
+				value = refValue.Elem().Interface()
+			}
 		} else {
 			value = field.Value
 		}
