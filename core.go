@@ -34,6 +34,9 @@ func (zenlog *DefaultZenlogger) unmarshalMap(v reflect.Value) map[string]interfa
 			newMap[iter.Key().String()] = zenlog.unmarshalMap(iter.Value())
 		case reflect.Interface:
 			newMap[iter.Key().String()] = zenlog.unmarshalInterface(iter.Value().Interface())
+		default:
+			// Fallback for any unhandled types
+			newMap[iter.Key().String()] = fmt.Sprintf("%v", iter.Value().Interface())
 		}
 	}
 
@@ -84,6 +87,11 @@ func (zenlog *DefaultZenlogger) unmarshalSliceAndArray(vRef reflect.Value) []int
 }
 
 func (zenlog *DefaultZenlogger) unmarshalInterface(value interface{}) (realVal interface{}) {
+	// Handle json.Number type specifically
+	if jsonNum, ok := value.(json.Number); ok {
+		return jsonNum.String()
+	}
+
 	v := reflect.ValueOf(value)
 	switch v.Kind() {
 	case reflect.String:
@@ -110,7 +118,8 @@ func (zenlog *DefaultZenlogger) unmarshalInterface(value interface{}) (realVal i
 	case reflect.Map:
 		realVal = zenlog.unmarshalMap(v)
 	default:
-		realVal = nil
+		// Fallback for any unhandled types - convert to string representation
+		realVal = fmt.Sprintf("%v", value)
 	}
 	return
 }
@@ -181,6 +190,9 @@ func (zenlog *DefaultZenlogger) unmarshalStruct(structToParse interface{}) inter
 				parsedStruct[tag] = f.Float64
 			case sql.NullTime:
 				parsedStruct[tag] = f.Time
+			case json.Number:
+				// Handle json.Number type
+				parsedStruct[tag] = f.String()
 			default:
 				parsedStruct[tag] = zenlog.unmarshalInterface(f)
 			}
