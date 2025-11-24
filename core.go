@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"time"
 )
 
 func (zenlog *DefaultZenlogger) unmarshalMap(v reflect.Value) map[string]interface{} {
@@ -92,6 +93,11 @@ func (zenlog *DefaultZenlogger) unmarshalInterface(value interface{}) (realVal i
 		return jsonNum.String()
 	}
 
+	// Handle time.Time type specifically
+	if t, ok := value.(time.Time); ok {
+		return t.Format(time.RFC3339)
+	}
+
 	v := reflect.ValueOf(value)
 	switch v.Kind() {
 	case reflect.String:
@@ -160,6 +166,11 @@ func (zenlog *DefaultZenlogger) unmarshalStruct(structToParse interface{}) inter
 		fields := fieldValues.Type()
 		parsedStruct := make(map[string]interface{})
 		for i := 0; i < fieldValues.NumField(); i++ {
+			// Skip unexported fields
+			if !fieldValues.Field(i).CanInterface() {
+				continue
+			}
+
 			tag := fields.Field(i).Tag.Get("json")
 			if tag == "" {
 				tag = fields.Field(i).Tag.Get("db")
@@ -190,6 +201,8 @@ func (zenlog *DefaultZenlogger) unmarshalStruct(structToParse interface{}) inter
 				parsedStruct[tag] = f.Float64
 			case sql.NullTime:
 				parsedStruct[tag] = f.Time
+			case time.Time:
+				parsedStruct[tag] = f.Format(time.RFC3339)
 			case json.Number:
 				// Handle json.Number type
 				parsedStruct[tag] = f.String()
