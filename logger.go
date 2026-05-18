@@ -25,10 +25,14 @@ type Zenlogger interface {
 	GetPid() string
 	Access(message string, fields ...ZenField) string
 	Info(message string, fields ...ZenField) string
+	Notice(message string, fields ...ZenField) string
 	Query(message string, fields ...ZenField) string
 	Debug(message string, fields ...ZenField) string
 	Warning(message string, fields ...ZenField) string
 	Error(message string, fields ...ZenField) string
+	Critical(message string, fields ...ZenField) string
+	Alert(message string, fields ...ZenField) string
+	Emergency(message string, fields ...ZenField) string
 }
 
 type DefaultZenlogger struct {
@@ -49,13 +53,17 @@ func NewZenlogger(pid ...string) Zenlogger {
 			Label: "pid",
 		},
 		Severity: Severity{
-			Label:   "severity",
-			Access:  DEFAULT_ACCESS,
-			Info:    DEFAULT_INFO,
-			Debug:   DEFAULT_DEBUG,
-			Warning: DFEAULT_WARNING,
-			Error:   DEFAULT_ERROR,
-			Query:   DEFAULT_QUERY,
+			Label:     "severity",
+			Access:    DEFAULT_ACCESS,
+			Info:      DEFAULT_INFO,
+			Debug:     DEFAULT_DEBUG,
+			Notice:    DEFAULT_NOTICE,
+			Warning:   DFEAULT_WARNING,
+			Error:     DEFAULT_ERROR,
+			Query:     DEFAULT_QUERY,
+			Critical:  DEFAULT_CRITICAL,
+			Alert:     DEFAULT_ALERT,
+			Emergency: DEFAULT_EMERGENCY,
 		},
 		DateTime: DateTime{
 			Label:  "timestamp",
@@ -74,6 +82,7 @@ func NewZenlogger(pid ...string) Zenlogger {
 			},
 		},
 		BeautifyJson: false,
+		Level:        LevelDebug,
 	}
 
 	return &DefaultZenlogger{

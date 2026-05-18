@@ -5,13 +5,17 @@ type ZenConf struct {
 }
 
 type Severity struct {
-	Label   string
-	Access  string
-	Info    string
-	Debug   string
-	Query   string
-	Warning string
-	Error   string
+	Label     string
+	Access    string
+	Info      string
+	Debug     string
+	Query     string
+	Notice    string
+	Warning   string
+	Error     string
+	Critical  string
+	Alert     string
+	Emergency string
 }
 
 type Message struct {
@@ -44,6 +48,7 @@ type Config struct {
 	Message      Message
 	BeautifyJson bool
 	Production   bool
+	Level        LogLevel
 	Output       Output
 }
 
@@ -69,6 +74,11 @@ func (zenlog *DefaultZenlogger) SetConfig(newConfig Config) {
 
 	// config production
 	zenlog.config.Production = newConfig.Production
+
+	// config level
+	if newConfig.Level > 0 {
+		zenlog.config.Level = newConfig.Level
+	}
 
 	// config output
 	zenlog.config.Output.Path = newConfig.Output.Path
@@ -101,7 +111,7 @@ func (zenlog *DefaultZenlogger) ConfSeverity(ServerityConf Severity) {
 	}
 
 	if ServerityConf.Warning != "" {
-		zenlog.config.Severity.Error = ServerityConf.Warning
+		zenlog.config.Severity.Warning = ServerityConf.Warning
 	}
 
 	if ServerityConf.Error != "" {
@@ -110,6 +120,22 @@ func (zenlog *DefaultZenlogger) ConfSeverity(ServerityConf Severity) {
 
 	if ServerityConf.Query != "" {
 		zenlog.config.Severity.Query = ServerityConf.Query
+	}
+
+	if ServerityConf.Notice != "" {
+		zenlog.config.Severity.Notice = ServerityConf.Notice
+	}
+
+	if ServerityConf.Critical != "" {
+		zenlog.config.Severity.Critical = ServerityConf.Critical
+	}
+
+	if ServerityConf.Alert != "" {
+		zenlog.config.Severity.Alert = ServerityConf.Alert
+	}
+
+	if ServerityConf.Emergency != "" {
+		zenlog.config.Severity.Emergency = ServerityConf.Emergency
 	}
 }
 

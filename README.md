@@ -1,21 +1,24 @@
 # Zenlogger :robot:
+
 [![GoDoc][doc-img]][doc]
 
 This library is built based on internal & personal needs.
 So, this lib can be not suit for your need.
 
-
-
 **This library support such as**
+
 - Logging to file (including customize naming file)
-- Structured log to satisfy Gcloud logs structure 
+- Structured log to satisfy Gcloud logs structure
 - Customize structure & keys
+- Full GCP severity levels (Debug, Info, Notice, Warning, Error, Critical, Alert, Emergency)
+- Log level filtering — execute only logs at or above configured level
 
 # Sample Output
 
 ###Sample structured output log
 
 This is the sample of output output when beautifyJson set to `true`.
+
 ```
 {
   "pid": "97732c84970d49a883193352f7da24f3",
@@ -64,8 +67,10 @@ This is the sample of output output when beautifyJson set to `true`.
 <br />
 
 ### Installation :rocket:
+
 **How to use**:
 This is the sample code of zenlogger usage
+
 ```
 package main
 
@@ -119,10 +124,13 @@ func Test_map(t *testing.T) {
 }
 
 ```
+
 <br/>
 
 ### Config
+
 This is the sample of config you can customize
+
 ```
 	logger := zenlogger.NewZenlogger()
 	config := zenlogger.Config{
@@ -130,13 +138,17 @@ This is the sample of config you can customize
 			Label: "insertId",
 		},
 		Severity: zenlogger.Severity{
-			Label:   "Level",
-			Access:  "API",
-			Info:    "THIS IS INFO",
-			Debug:   "DEBUG",
-			Warning: "Please Attention To This",
-			Error:   "Fault",
-			Query:   "DB",
+			Label:     "Level",
+			Access:    "API",
+			Info:      "THIS IS INFO",
+			Debug:     "DEBUG",
+			Notice:    "NOTICE",
+			Warning:   "Please Attention To This",
+			Error:     "Fault",
+			Query:     "DB",
+			Critical:  "CRITICAL",
+			Alert:     "ALERT",
+			Emergency: "EMERGENCY",
 		},
 		Caller: zenlogger.Caller{
 			Label: "trace_file",
@@ -156,9 +168,10 @@ This is the sample of config you can customize
 	logger.SetConfig(config)
 ```
 
-
 ### Set log to file
+
 You can set the log to make zenlogger write into file by adding:
+
 ```
 	config := zenlogger.Config{}
 	config.Output.Path = "logs"
@@ -166,36 +179,74 @@ You can set the log to make zenlogger write into file by adding:
 	config.BeautifyJson = true
 	logger.SetConfig(config)
 ```
+
 Zenlogger will automatically make directory logs (if not exists), and write into file with golang timed format.
 <br><br><br>
 
 ### Config Property :robot:
-| Property  | sub  |description   |
-| ------------ | ------------ | ------------ |
-| Pid |  | process id is label of the key that differentiate with another process in your program  | 
-| Severity  | Label  | The label of severity key   |
-| Severity  | Access   | The value of severity when you call zenlogger.Access()   |
-| Severity  | Info   | The value of severity when you call zenlogger.Info()   |
-| Severity  | Debug   | The value of severity when you call zenlogger.Debug()   |
-| Severity  | Warning   | The value of severity when you call zenlogger.Warning()   |
-| Severity  | Error   | The value of severity when you call zenlogger.Error()   |
-| Severity  | Query   | The value of severity when you call zenlogger.Query()   |
-| DateTime  | Label | The label of datetime key when log written |
-| DateTime  | Format | The output datetime format, using standard GO datetime format |
-| Caller    | Label | The label of caller key |
-| Caller    | Level | The level of caller key. the default is 0 |
-| Message   | Label   | The label of message key   |
-| Message   | Title.Label   | The label of title key   |
-| Message   | Values.Label   | The label of values key   |
-| BeautifyJson  |   | The beautify config, true to make it beautify formatted, otherwise, set it to false   |
-| Output  | Path  | The output path of log files   |
-| Output  | Format  | The output file name using datetime GO format   |
 
+| Property     | sub          | description                                                                                                          |
+| ------------ | ------------ | -------------------------------------------------------------------------------------------------------------------- |
+| Pid          |              | process id is label of the key that differentiate with another process in your program                               |
+| Severity     | Label        | The label of severity key                                                                                            |
+| Severity     | Access       | The value of severity when you call zenlogger.Access()                                                               |
+| Severity     | Info         | The value of severity when you call zenlogger.Info()                                                                 |
+| Severity     | Debug        | The value of severity when you call zenlogger.Debug()                                                                |
+| Severity     | Warning      | The value of severity when you call zenlogger.Warning()                                                              |
+| Severity     | Error        | The value of severity when you call zenlogger.Error()                                                                |
+| Severity     | Notice       | The value of severity when you call zenlogger.Notice()                                                               |
+| Severity     | Query        | The value of severity when you call zenlogger.Query()                                                                |
+| Severity     | Critical     | The value of severity when you call zenlogger.Critical()                                                             |
+| Severity     | Alert        | The value of severity when you call zenlogger.Alert()                                                                |
+| Severity     | Emergency    | The value of severity when you call zenlogger.Emergency()                                                            |
+| DateTime     | Label        | The label of datetime key when log written                                                                           |
+| DateTime     | Format       | The output datetime format, using standard GO datetime format                                                        |
+| Caller       | Label        | The label of caller key                                                                                              |
+| Caller       | Level        | The level of caller key. the default is 0                                                                            |
+| Message      | Label        | The label of message key                                                                                             |
+| Message      | Title.Label  | The label of title key                                                                                               |
+| Message      | Values.Label | The label of values key                                                                                              |
+| BeautifyJson |              | The beautify config, true to make it beautify formatted, otherwise, set it to false                                  |
+| Level        |              | Minimum log level to execute. Logs below this level are skipped entirely. Default is `LevelDebug` (all logs execute) |
+| Output       | Path         | The output path of log files                                                                                         |
+| Output       | Format       | The output file name using datetime GO format                                                                        |
 
+### Log Level Filtering
 
+Control which logs execute by setting a minimum level. Logs with a level **below** the configured value are skipped entirely with zero cost (no JSON marshaling, no reflection).
 
-You can set or try it in the link below here: 
-:point_right: [GO Play](https://goplay.tools/snippet/i9cDLZ8yVHf "GO Play").  :point_left:
+```
+const (
+    LevelDebug     LogLevel = 100  // Access & Query share this tier
+    LevelInfo       LogLevel = 200
+    LevelNotice     LogLevel = 300
+    LevelWarning    LogLevel = 400
+    LevelError      LogLevel = 500
+    LevelCritical   LogLevel = 600
+    LevelAlert      LogLevel = 700
+    LevelEmergency  LogLevel = 800
+)
+```
+
+Example — only execute Warning and above:
+
+```
+logger := zenlogger.NewZenlogger()
+logger.SetConfig(zenlogger.Config{
+    Level: zenlogger.LevelWarning, // skips Debug, Info, Notice, Access, Query
+})
+
+logger.Debug("skipped")    // no-op
+logger.Info("skipped")     // no-op
+logger.Warning("executed") // written
+logger.Critical("executed") // written
+```
+
+Default is `LevelDebug` — all logs execute unless you configure otherwise.
+<br><br><br>
+
+You can set or try it in the link below here:
+:point_right: [GO Play](https://goplay.tools/snippet/i9cDLZ8yVHf "GO Play"). :point_left:
 <br><br>
 
 This library is released under: [MIT License](https://github.com/zenmuharom/zenlogger/blob/master/LICENSE.txt "MIT License").
