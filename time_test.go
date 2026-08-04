@@ -9,7 +9,7 @@ import (
 )
 
 func TestTimeType(t *testing.T) {
-	logger := NewZenlogger()
+	logger := newTestLogger(t)
 
 	// Test with direct time.Time value
 	now := time.Now()
@@ -95,7 +95,7 @@ func TestTimeType(t *testing.T) {
 }
 
 func TestTimeTypeZeroValue(t *testing.T) {
-	logger := NewZenlogger()
+	logger := newTestLogger(t)
 
 	// Test with zero time
 	var zeroTime time.Time

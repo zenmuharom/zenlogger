@@ -5,8 +5,8 @@ import (
 )
 
 func Test_pointer(t *testing.T) {
-	logger := NewZenlogger()
-	logger.SetConfig(Config{BeautifyJson: true})
+	logger := newTestLogger(t)
+	setTestConfig(t, logger, Config{BeautifyJson: true})
 
 	patrick := &Person{
 		Name:         "Patrick",

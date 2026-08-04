@@ -40,6 +40,17 @@ type Output struct {
 	BufferSize int64
 }
 
+type SensitiveFieldRule struct {
+	Type      MaskType
+	MaskCount int
+}
+
+type SensitiveFieldConfig struct {
+	Enabled         bool
+	CaseInsensitive bool
+	Rules           map[string]SensitiveFieldRule
+}
+
 type Config struct {
 	Pid          ZenConf
 	Severity     Severity
@@ -50,6 +61,7 @@ type Config struct {
 	Production   bool
 	Level        LogLevel
 	Output       Output
+	Sensitive    SensitiveFieldConfig
 }
 
 func (zenlog *DefaultZenlogger) SetConfig(newConfig Config) {
@@ -84,6 +96,9 @@ func (zenlog *DefaultZenlogger) SetConfig(newConfig Config) {
 	zenlog.config.Output.Path = newConfig.Output.Path
 	zenlog.config.Output.Format = newConfig.Output.Format
 	zenlog.config.Output.BufferSize = newConfig.Output.BufferSize
+
+	// config sensitive field protection
+	zenlog.ConfSensitive(newConfig.Sensitive)
 }
 
 func (zenlog *DefaultZenlogger) ConfPid(pidConf ZenConf) {
@@ -176,4 +191,19 @@ func (zenlog *DefaultZenlogger) ConfMessage(MessageConf Message) {
 
 func (zenlog *DefaultZenlogger) GetConfig() Config {
 	return zenlog.config
+}
+
+func (zenlog *DefaultZenlogger) ConfSensitive(sensitiveConf SensitiveFieldConfig) {
+	zenlog.config.Sensitive.Enabled = sensitiveConf.Enabled
+	zenlog.config.Sensitive.CaseInsensitive = sensitiveConf.CaseInsensitive
+
+	if sensitiveConf.Rules != nil {
+		if zenlog.config.Sensitive.Rules == nil {
+			zenlog.config.Sensitive.Rules = make(map[string]SensitiveFieldRule)
+		}
+
+		for key, rule := range sensitiveConf.Rules {
+			zenlog.config.Sensitive.Rules[key] = rule
+		}
+	}
 }

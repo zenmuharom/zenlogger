@@ -2,12 +2,15 @@ package zenlogger
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -88,6 +91,10 @@ func (zenlog *DefaultZenlogger) unmarshalSliceAndArray(vRef reflect.Value) []int
 }
 
 func (zenlog *DefaultZenlogger) unmarshalInterface(value interface{}) (realVal interface{}) {
+	if value == nil {
+		return nil
+	}
+
 	// Handle json.Number type specifically
 	if jsonNum, ok := value.(json.Number); ok {
 		return jsonNum.String()
@@ -99,6 +106,10 @@ func (zenlog *DefaultZenlogger) unmarshalInterface(value interface{}) (realVal i
 	}
 
 	v := reflect.ValueOf(value)
+	if !v.IsValid() {
+		return nil
+	}
+
 	switch v.Kind() {
 	case reflect.String:
 		if json.Valid([]byte(value.(string))) {
@@ -233,7 +244,9 @@ func (zenlog *DefaultZenlogger) parse(fields ...ZenField) map[string]interface{}
 
 		// Use reflection to check if the value in the interface is a pointer
 		refValue := reflect.ValueOf(field.Value)
-		if refValue.Kind() == reflect.Ptr {
+		if !refValue.IsValid() {
+			value = nil
+		} else if refValue.Kind() == reflect.Ptr {
 			// Check if the pointer is nil
 			if refValue.IsNil() {
 				value = nil
@@ -245,9 +258,106 @@ func (zenlog *DefaultZenlogger) parse(fields ...ZenField) map[string]interface{}
 			value = field.Value
 		}
 
-		parsed[field.Key] = zenlog.unmarshalInterface(value)
+		parsedValue := zenlog.unmarshalInterface(value)
+		parsed[field.Key] = zenlog.applyFieldMask(parsedValue, field)
 	}
 	return parsed
+}
+
+func (zenlog *DefaultZenlogger) applyFieldMask(value interface{}, field ZenField) interface{} {
+	fieldType := field.Type
+	maskCount := field.MaskCount
+
+	if fieldType == "" {
+		rule, ok := zenlog.resolveSensitiveRule(field.Key)
+		if ok {
+			fieldType = rule.Type
+			if maskCount <= 0 {
+				maskCount = rule.MaskCount
+			}
+		}
+	}
+
+	if fieldType == "" {
+		return value
+	}
+
+	strValue := fmt.Sprintf("%v", value)
+	if strValue == "<nil>" {
+		return value
+	}
+
+	return protectString(strValue, fieldType, maskCount)
+}
+
+func (zenlog *DefaultZenlogger) resolveSensitiveRule(key string) (SensitiveFieldRule, bool) {
+	sensitiveConf := zenlog.config.Sensitive
+	if !sensitiveConf.Enabled || key == "" || sensitiveConf.Rules == nil {
+		return SensitiveFieldRule{}, false
+	}
+
+	if rule, ok := sensitiveConf.Rules[key]; ok {
+		return rule, true
+	}
+
+	if !sensitiveConf.CaseInsensitive {
+		return SensitiveFieldRule{}, false
+	}
+
+	if rule, ok := sensitiveConf.Rules[strings.ToLower(key)]; ok {
+		return rule, true
+	}
+
+	for ruleKey, rule := range sensitiveConf.Rules {
+		if strings.EqualFold(ruleKey, key) {
+			return rule, true
+		}
+	}
+
+	return SensitiveFieldRule{}, false
+}
+
+func protectString(value string, maskType MaskType, maskCount int) string {
+	if value == "" {
+		return value
+	}
+
+	runes := []rune(value)
+	length := len(runes)
+
+	switch maskType {
+	case FULL_MASKED:
+		return strings.Repeat("*", length)
+	case FIRST_MASKED:
+		count := normalizedMaskCount(maskCount, length)
+		return strings.Repeat("*", count) + string(runes[count:])
+	case LAST_MASKED:
+		count := normalizedMaskCount(maskCount, length)
+		return string(runes[:length-count]) + strings.Repeat("*", count)
+	case FIRST_LAST_MASKED:
+		count := normalizedMaskCount(maskCount, length)
+		if count*2 >= length {
+			return strings.Repeat("*", length)
+		}
+		return strings.Repeat("*", count) + string(runes[count:length-count]) + strings.Repeat("*", count)
+	case REDACTED:
+		return "[REDACTED]"
+	case HASH_SHA256:
+		hash := sha256.Sum256([]byte(value))
+		return hex.EncodeToString(hash[:])
+	default:
+		return value
+	}
+}
+
+func normalizedMaskCount(maskCount int, max int) int {
+	if maskCount <= 0 {
+		return 1
+	}
+	if maskCount > max {
+		return max
+	}
+	return maskCount
 }
 
 func jsonMarshal(t interface{}, indentation bool) ([]byte, error) {

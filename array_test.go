@@ -5,8 +5,8 @@ import (
 )
 
 func Test_array(t *testing.T) {
-	logger := NewZenlogger()
-	logger.SetConfig(Config{BeautifyJson: true})
+	logger := newTestLogger(t)
+	setTestConfig(t, logger, Config{BeautifyJson: true})
 
 	family := make([]Person, 0)
 	family = append(family, Person{

@@ -13,8 +13,8 @@ type Person struct {
 
 func Test_map(t *testing.T) {
 
-	logger := NewZenlogger()
-	logger.SetConfig(Config{BeautifyJson: true})
+	logger := newTestLogger(t)
+	setTestConfig(t, logger, Config{BeautifyJson: true})
 
 	person := Person{
 		Name:      "Zeni",

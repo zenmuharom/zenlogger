@@ -10,7 +10,7 @@ import (
 )
 
 func TestLogger(t *testing.T) {
-	logger := NewZenlogger()
+	logger := newTestLogger(t)
 	logger.Info("test info 0")
 	logger.Error("test error 0")
 	logger.WithPid("00as0df0").Info("test info 1")
@@ -33,7 +33,7 @@ func TestLogger(t *testing.T) {
 			},
 		},
 	}
-	logger.SetConfig(config0)
+	setTestConfig(t, logger, config0)
 	logger.Info("test with json 2", ZenField{
 		Key: "trx",
 		Value: `{
@@ -49,7 +49,7 @@ func TestLogger(t *testing.T) {
 			Label: "insertId",
 		},
 	}
-	logger.SetConfig(config)
+	setTestConfig(t, logger, config)
 	logger.Info("test info 3")
 
 	logger.Info("changing caller label & level....")
@@ -59,7 +59,7 @@ func TestLogger(t *testing.T) {
 			Level: 0,
 		},
 	}
-	logger.SetConfig(config)
+	setTestConfig(t, logger, config)
 	logger.Info("test info 4")
 
 	logger.Info("changing datetime....")
@@ -69,7 +69,7 @@ func TestLogger(t *testing.T) {
 			Format: "2 Jan 2006 15:04:05",
 		},
 	}
-	logger.SetConfig(config)
+	setTestConfig(t, logger, config)
 	logger.Info("test info 4")
 
 	logger.Info("changing severity label....")
@@ -84,7 +84,7 @@ func TestLogger(t *testing.T) {
 		},
 		BeautifyJson: true,
 	}
-	logger.SetConfig(config)
+	setTestConfig(t, logger, config)
 	logger.Info("test info 5")
 	logger.Debug("test debug 5")
 	logger.Error("test error 5")
@@ -134,7 +134,7 @@ func TestLogger(t *testing.T) {
 	config.Output.Path = "logs"
 	config.Output.Format = "2006"
 	config.BeautifyJson = true
-	logger.SetConfig(config)
+	setTestConfig(t, logger, config)
 	fmt.Println(config.Output.Path)
 	logger.Info("test info 6")
 	logger.Debug("test debug 6")
@@ -155,7 +155,7 @@ func TestLogger(t *testing.T) {
 }
 
 func Test_get_string_log_test(t *testing.T) {
-	logger := NewZenlogger()
+	logger := newTestLogger(t)
 	get_info := logger.Info("test info 0")
 	get_error := logger.Error("test error 0")
 	get_with_different_pid := logger.WithPid("00as0df0").Info("test info 1")

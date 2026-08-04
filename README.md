@@ -12,6 +12,7 @@ So, this lib can be not suit for your need.
 - Customize structure & keys
 - Full GCP severity levels (Debug, Info, Notice, Warning, Error, Critical, Alert, Emergency)
 - Log level filtering — execute only logs at or above configured level
+- Caller metadata includes relative file path and line number (example: `internal/service/inquiry.go:32`)
 
 # Sample Output
 
@@ -185,31 +186,34 @@ Zenlogger will automatically make directory logs (if not exists), and write into
 
 ### Config Property :robot:
 
-| Property     | sub          | description                                                                                                          |
-| ------------ | ------------ | -------------------------------------------------------------------------------------------------------------------- |
-| Pid          |              | process id is label of the key that differentiate with another process in your program                               |
-| Severity     | Label        | The label of severity key                                                                                            |
-| Severity     | Access       | The value of severity when you call zenlogger.Access()                                                               |
-| Severity     | Info         | The value of severity when you call zenlogger.Info()                                                                 |
-| Severity     | Debug        | The value of severity when you call zenlogger.Debug()                                                                |
-| Severity     | Warning      | The value of severity when you call zenlogger.Warning()                                                              |
-| Severity     | Error        | The value of severity when you call zenlogger.Error()                                                                |
-| Severity     | Notice       | The value of severity when you call zenlogger.Notice()                                                               |
-| Severity     | Query        | The value of severity when you call zenlogger.Query()                                                                |
-| Severity     | Critical     | The value of severity when you call zenlogger.Critical()                                                             |
-| Severity     | Alert        | The value of severity when you call zenlogger.Alert()                                                                |
-| Severity     | Emergency    | The value of severity when you call zenlogger.Emergency()                                                            |
-| DateTime     | Label        | The label of datetime key when log written                                                                           |
-| DateTime     | Format       | The output datetime format, using standard GO datetime format                                                        |
-| Caller       | Label        | The label of caller key                                                                                              |
-| Caller       | Level        | The level of caller key. the default is 0                                                                            |
-| Message      | Label        | The label of message key                                                                                             |
-| Message      | Title.Label  | The label of title key                                                                                               |
-| Message      | Values.Label | The label of values key                                                                                              |
-| BeautifyJson |              | The beautify config, true to make it beautify formatted, otherwise, set it to false                                  |
-| Level        |              | Minimum log level to execute. Logs below this level are skipped entirely. Default is `LevelDebug` (all logs execute) |
-| Output       | Path         | The output path of log files                                                                                         |
-| Output       | Format       | The output file name using datetime GO format                                                                        |
+| Property     | sub             | description                                                                                                          |
+| ------------ | --------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Pid          |                 | process id is label of the key that differentiate with another process in your program                               |
+| Severity     | Label           | The label of severity key                                                                                            |
+| Severity     | Access          | The value of severity when you call zenlogger.Access()                                                               |
+| Severity     | Info            | The value of severity when you call zenlogger.Info()                                                                 |
+| Severity     | Debug           | The value of severity when you call zenlogger.Debug()                                                                |
+| Severity     | Warning         | The value of severity when you call zenlogger.Warning()                                                              |
+| Severity     | Error           | The value of severity when you call zenlogger.Error()                                                                |
+| Severity     | Notice          | The value of severity when you call zenlogger.Notice()                                                               |
+| Severity     | Query           | The value of severity when you call zenlogger.Query()                                                                |
+| Severity     | Critical        | The value of severity when you call zenlogger.Critical()                                                             |
+| Severity     | Alert           | The value of severity when you call zenlogger.Alert()                                                                |
+| Severity     | Emergency       | The value of severity when you call zenlogger.Emergency()                                                            |
+| DateTime     | Label           | The label of datetime key when log written                                                                           |
+| DateTime     | Format          | The output datetime format, using standard GO datetime format                                                        |
+| Caller       | Label           | The label of caller key                                                                                              |
+| Caller       | Level           | The level of caller key. the default is 0                                                                            |
+| Message      | Label           | The label of message key                                                                                             |
+| Message      | Title.Label     | The label of title key                                                                                               |
+| Message      | Values.Label    | The label of values key                                                                                              |
+| BeautifyJson |                 | The beautify config, true to make it beautify formatted, otherwise, set it to false                                  |
+| Level        |                 | Minimum log level to execute. Logs below this level are skipped entirely. Default is `LevelDebug` (all logs execute) |
+| Output       | Path            | The output path of log files                                                                                         |
+| Output       | Format          | The output file name using datetime GO format                                                                        |
+| Sensitive    | Enabled         | Enable automatic sensitive field protection by key                                                                   |
+| Sensitive    | CaseInsensitive | Match sensitive keys case-insensitively                                                                              |
+| Sensitive    | Rules           | Key-to-rule map for automatic protection (`Type`, optional `MaskCount`)                                              |
 
 ### Log Level Filtering
 
@@ -244,6 +248,79 @@ logger.Critical("executed") // written
 
 Default is `LevelDebug` — all logs execute unless you configure otherwise.
 <br><br><br>
+
+### Sensitive Field Masking
+
+You can mask sensitive values directly per field.
+
+```
+logger.Info("db connection",
+		zenlogger.ZenField{Key: "username", Value: username, Type: zenlogger.FIRST_MASKED, MaskCount: 2},
+		zenlogger.ZenField{Key: "password", Value: password, Type: zenlogger.FULL_MASKED},
+)
+```
+
+Or use helper constructors for cleaner call sites:
+
+```
+logger.Info("db connection",
+	zenlogger.Field("username", username),
+	zenlogger.MaskedField("password", password, zenlogger.FULL_MASKED, 0),
+)
+```
+
+Or configure automatic protection by key so caller does not need to set `Type` on every field:
+
+```
+logger := zenlogger.NewZenlogger()
+logger.SetConfig(zenlogger.Config{
+	Sensitive: zenlogger.SensitiveFieldConfig{
+		Enabled:         true,
+		CaseInsensitive: true,
+		Rules: map[string]zenlogger.SensitiveFieldRule{
+			"password": {Type: zenlogger.FULL_MASKED},
+			"token":    {Type: zenlogger.FIRST_LAST_MASKED, MaskCount: 2},
+			"api_key":  {Type: zenlogger.REDACTED},
+		},
+	},
+})
+
+logger.Info("db connection",
+	zenlogger.Field("username", username),
+	zenlogger.Field("password", password),
+	zenlogger.Field("token", token),
+	zenlogger.Field("api_key", apiKey),
+)
+```
+
+Available protection types:
+
+- `FULL_MASKED`: mask the entire value
+- `FIRST_MASKED`: mask first `MaskCount` characters
+- `LAST_MASKED`: mask last `MaskCount` characters
+- `FIRST_LAST_MASKED`: mask first and last `MaskCount` characters
+- `REDACTED`: replace value with `[REDACTED]`
+- `HASH_SHA256`: replace value with SHA-256 hash (hex encoded)
+
+Notes:
+
+- `MaskCount` defaults to `1` when not set or `<= 0`
+- If `MaskCount` is longer than the value length, masking is capped to value length
+- Protection is applied to the final string representation of `Value`
+
+Example output:
+
+```
+{
+	"message": {
+		"title": "db connection",
+		"values": {
+			"username": "**npayuser",
+			"password": "********"
+		}
+	}
+}
+```
 
 You can set or try it in the link below here:
 :point_right: [GO Play](https://goplay.tools/snippet/i9cDLZ8yVHf "GO Play"). :point_left:

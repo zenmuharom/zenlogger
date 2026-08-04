@@ -3,7 +3,7 @@ package zenlogger
 import "testing"
 
 func Test_config(t *testing.T) {
-	logger := NewZenlogger()
+	logger := newTestLogger(t)
 	config := Config{
 		Severity: Severity{
 			Label:   "level",
@@ -16,7 +16,7 @@ func Test_config(t *testing.T) {
 		},
 		BeautifyJson: true,
 	}
-	logger.SetConfig(config)
+	setTestConfig(t, logger, config)
 	logger.Info("This is info")
 	logger.Debug("this is debug")
 	logger.Warning("This is warning")
