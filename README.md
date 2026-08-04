@@ -69,6 +69,37 @@ This is the sample of output output when beautifyJson set to `true`.
 
 ### Installation :rocket:
 
+### Short Usage
+
+```
+package main
+
+import "github.com/zenmuharom/zenlogger"
+
+func main() {
+	logger := zenlogger.NewZenlogger()
+	logger.SetConfig(zenlogger.Config{
+		Output: zenlogger.Output{Path: "logs", Format: "20060102"},
+		Sensitive: zenlogger.SensitiveFieldConfig{
+			Enabled:         true,
+			CaseInsensitive: true,
+			Rules: map[string]zenlogger.SensitiveFieldRule{
+				"password": {Type: zenlogger.FULL_MASKED},
+				"token":    {Type: zenlogger.FIRST_LAST_MASKED, MaskCount: 2},
+			},
+		},
+	})
+
+	logger.Info("db connection",
+		zenlogger.Field("username", "finpayuser"),
+		zenlogger.Field("password", "mysecret"),
+		zenlogger.Field("token", "abcde12345xyz"),
+	)
+}
+```
+
+Caller output format is `package/file.go:line` (example: `service/inquiry.go:39`).
+
 **How to use**:
 This is the sample code of zenlogger usage
 
